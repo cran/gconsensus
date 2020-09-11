@@ -1,0 +1,18 @@
+import(stats, graphics, MASS, utils, grDevices)
+
+importFrom("graphics", "abline", "axis", "barplot", "curve", "legend", "par", "plot", "text")
+importFrom("MASS", "ginv")
+importFrom("utils", "capture.output")
+importFrom("grDevices", "rgb")
+
+exportPattern("^[[:alpha:]]+")
+
+S3method(toString, gconsensus)
+S3method(print, gconsensus)
+S3method(plot, gconsensus)
+S3method(toString, doe)
+S3method(print, doe)
+S3method(plot, doe)
+S3method(toString, comparison)
+S3method(print, comparison)
+S3method(plot, comparison)
