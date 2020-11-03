@@ -37,6 +37,7 @@ plot.doe <- function(x, ...) {
     xlab <- x$fit$code[mss]
     ssxlab<- "Source code"
   }
+  ssxlab <- ""
 
   sxlab <- c(xlab)
   # mark excluded values writeing name or code between brackets

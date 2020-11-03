@@ -335,9 +335,10 @@
   }
   
   mu.e <- mean(o.mu)
-	sd.e <- sqrt( sum(o.s2/o.n)/length(o.mu)^2 + (max(o.mu) - min(o.mu))^2/12)
+  sb2 <- (max(o.mu) - min(o.mu))^2/12
+	sd.e <- sqrt( sum(o.s2/o.n)/length(o.mu)^2 + sb2)
 	ci.e <- mu.e + kp*c(-1,1)*sd.e
-	return( list(mu = mu.e, u.mu = sd.e, ci.mu = ci.e, iter = 1) )
+	return( list(mu = mu.e, u.mu = sd.e, ci.mu = ci.e, sb2 = sb2, iter = 1) )
 }
 
 
@@ -422,4 +423,111 @@
   return( list(mu = median(Xb), 
                u.mu = sqrt((sqrt(pi/2/p)*mad(Xb))^2 + tau2),
                var.b = tau2, ci.mu = ci.mu))
+}
+
+## 2020-01-21: hierarchical beyesian method was included
+.internal.hb <- function(o.mu, o.s2, o.n, build.model = NULL, get.samples = NULL, 
+			alpha = 0.05, seed = 12345, MC_samples = 250000, file = file) {
+  build.model<- match.fun(build.model)
+  get.samples<- match.fun(get.samples)
+  p <- length(o.mu)
+
+  o.n[is.na(o.n)]<- 0
+  if (all(is.na(o.n)) | all(o.n<2)) {
+  ## 2020-01-26: case when no dof are provided    
+    cat("model
+	{
+        tau.b<- 1/pow(u.b, 2)
+        tau.w<- 1/pow(u.w, 2)
+        for(i in 1 : n) {
+        # half cauchy distribution
+        sigma.with[i] ~ dt(0, tau.w, 1)I(0,)
+        ptau.with[i]<- 1/pow(sigma.with[i], 2)
+        lambda[i] ~ dnorm(0, ptau.btw)
+        cmu[i]<- mu+lambda[i]
+        ybar[i] ~ dnorm(cmu[i], ptau.with[i])
+        }	
+        # half cauchy distribution
+        sigma.btw ~ dt(0, tau.b, 1)I(0,)
+        ptau.btw <- 1/pow(sigma.btw, 2)
+        mu ~ dnorm(0.0, 1.0E-10)
+  }", file = file) #"consensus_model.txt")
+
+    ##### observed data
+    dat <- list("n" = p, u.w = median(sqrt(o.s2)), u.b = mad(o.mu), 
+                "ybar" = o.mu, "sigma.with" = sqrt(o.s2))  # names list of numbers
+    ##### Initial values
+    inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
+                   lambda = rep(0, length(o.mu)),
+                   ".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = seed )
+    #### specify parameters to be monitored
+    params <- c("mu", "sigma.btw", "cmu")
+    #### build the model as jags object, quiet mode
+    jags.m <- build.model( file = file, data=dat, inits=inits, 
+			n.chains=1, n.adapt=1000, quiet = TRUE )
+    ## run JAGS and save posterior samples, does not show progress report
+    samps <- get.samples( jags.m, params, n.iter = MC_samples, thin = 25, 
+                           progress.bar = "gui" )
+    ## summarize posterior samples
+    # Burn in of 50000. Start at 50001.
+    res.sum <- summary(window(samps, start=50001), 
+                       quantile = c(alpha/2, 1-alpha/2))
+    
+    mu.hat<- res.sum$statistics[p+1, 1]
+    u.mu.hat<- res.sum$statistics[p+1, 2]
+    tau2<- res.sum$statistics[p+2, 1]^2
+    ci.mu<- res.sum$quantiles[p+1, c(1, 2)]
+} else if (all(o.n>1)) {
+  cat("model
+	{
+      tau.b<- 1/pow(u.b, 2)
+      for(i in 1 : n) {
+      # chisqr distribution
+      shape[i]<- nu[i]/2
+      scale[i]<- 2*pow(u.w, 2)/nu[i]
+      sigma2.with[i] ~ dgamma(shape[i], scale[i])
+      ptau.with[i]<- 1/sigma2.with[i]
+      lambda[i] ~ dnorm(0, ptau.btw)
+      cmu[i]<- mu+lambda[i]
+      ybar[i] ~ dnorm(cmu[i], ptau.with[i])
+      }	
+      # half cauchy distribution
+      sigma.btw ~ dt(0, tau.b, 1)I(0,)
+      ptau.btw <- 1/pow(sigma.btw, 2)
+      mu ~ dnorm(0.0, 1.0E-10)
+  }", file = file)
+
+  ##### observed data
+  dat <- list("n" = p, u.w = median(sqrt(o.s2)), u.b = mad(o.mu), 
+              "ybar" = o.mu, "sigma2.with" = o.s2, "nu" = o.n-1)  # names list of numbers
+  ##### Initial values
+  inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
+                 lambda = rep(0, length(o.mu)),
+                 ".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = seed )
+  #### specify parameters to be monitored
+  params <- c("mu", "sigma.btw", "cmu")
+  #### build the model as jags object, quiet mode
+  jags.m <- build.model( file = file, data=dat, inits=inits, 
+			n.chains=1, n.adapt=1000, quiet = TRUE )
+  ## run JAGS and save posterior samples, does not show progress report
+  samps <- get.samples( jags.m, params, n.iter = MC_samples, thin = 25, 
+                         progress.bar = "gui" )
+  ## summarize posterior samples
+  # Burn in of 50000. Start at 50001.
+  res.sum <- summary(window(samps, start=50001), 
+                     quantile = c(alpha/2, 1-alpha/2))
+  
+  mu.hat<- res.sum$statistics[p+1, 1]
+  u.mu.hat<- res.sum$statistics[p+1, 2]
+  tau2<- res.sum$statistics[p+2, 1]^2
+  ci.mu<- res.sum$quantiles[p+1, c(1, 2)]
+} else { # mixture o.n are NA or numeric
+  # not implemented
+  stop("mixture of defined and undefined degrees of freedom is not implemented.")
+}
+  
+  return( 
+    list(mu = mu.hat, 
+         u.mu = u.mu.hat,
+         var.b = tau2, ci.mu = ci.mu))
 }

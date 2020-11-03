@@ -2,18 +2,18 @@
 \alias{print.gconsensus}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Prints a gConsensus Object.
+  Prints a gconsensus object
 }
 \description{
-  Prints a gconsensus object.
+  Prints a gconsensus object
 }
 \usage{
 \method{print}{gconsensus}(x, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a gconsensus object.}
-  \item{\dots}{any additional parameter.}
+  \item{x}{a gconsensus object}
+  \item{\dots}{any additional parameter}
 }
 \details{
   option \code{digits} is used.

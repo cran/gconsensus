@@ -13,11 +13,9 @@
   \item{x}{gconsensus, object to be described.}
   \item{\dots}{any additional parameters.}
 }
-
 \value{
-  string, it contains a verbatim description of the consensus object.
+  string, it contains a verbatim description of the gconsensus object.
 }
-
 \author{
 \packageAuthor{gconsensus}
 

@@ -4,7 +4,7 @@
   Prints a Comparison Object.
 }
 \description{
-  Prints the gconsensus comparison object. One line for each selected gconsensus method.
+  Prints the consensus comparison object. One line for each selected gconsensus method.
 }
 \usage{
 \method{print}{comparison}(x, ...)
@@ -14,7 +14,7 @@
   \item{\dots}{any additional parameters.}
 }
 \value{
-  A displayed text containing a summary of the compared gconsensus methods.
+  A displayed text containing a summary of the selected gconsensus methods.
 }
 \author{
 \packageAuthor{gconsensus}
@@ -32,3 +32,4 @@ Maintainer: \packageMaintainer{gconsensus}
 % R documentation directory.
 \keyword{ print }
 \keyword{ comparison } % __ONLY ONE__ keyword per line
+

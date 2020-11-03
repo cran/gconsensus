@@ -1,5 +1,6 @@
 ## 2017-03-14: expansion type was included as a parameter
 ## 2020-01-21: hierarchical bayesian method was included
+## 2020-11-02: hierarchical bayesian comments from Rpackages reviewers about allowing model_file to be user defined
 gconsensus <- function(ilab, method = "mean",
 		      build.model = NULL, get.samples = NULL,
                       config = list(alpha = 0.05,
@@ -7,7 +8,8 @@ gconsensus <- function(ilab, method = "mean",
                                     unreliable.uncertainties = FALSE,
                                     MC_samples = 1e5,
                                     MC_seed = NA,
-                                    MC_use.HKSJ.adjustment = FALSE
+                                    MC_use.HKSJ.adjustment = FALSE,
+					filename = "hb_consensus_model.txt"
                                     )
                       ) {
   mss <- rep(TRUE, length(ilab$data$mean))
@@ -35,8 +37,8 @@ gconsensus <- function(ilab, method = "mean",
     }
   }
 ## end
- 
-	qq <- 1
+  
+  qq <- 1
   tau <- 0
 	if (all(is.null(n))) { n <- rep(2, length(x)) }
 	if (method == "mean") {
@@ -106,10 +108,12 @@ gconsensus <- function(ilab, method = "mean",
 	} else if (method == "MPM") {
 	  res <- .internal.mpmm(x, u2 * n, n, alpha = config$alpha)
 	  tau <- sqrt(res$sb2)
-#	} else if (method == "HB") {
-#	  res <- .internal.hb(x, u2, n, build.model, get.samples, 
-#			      alpha = config$alpha, seed = config$MC_seed)
-#	  tau <- sqrt(res$var.b)
+	} else if (method == "HB") {
+	  res <- .internal.hb(x, u2, n, build.model, get.samples, 
+			      alpha = config$alpha, seed = config$MC_seed,
+			      MC_samples = config$MC_samples,
+				file = file.path(tempdir(), config$filename))
+	  tau <- sqrt(res$var.b)
 	} else if (method == "VRMLE") {
 	  res <- vr.mle(x, u2 * n, n, alpha = config$alpha, tol = 1e-12, 
 	    max.iter = 3000)
@@ -117,6 +121,7 @@ gconsensus <- function(ilab, method = "mean",
 	} else if (method == "BOB") {
 	  res <- .internal.bob(x, u2 * n, n, alpha = config$alpha, 
 	    expansion = config$expansion.factor.type)
+	  tau <- sqrt(res$sb2)
 	} else if (method == "SE") {
 	  res <- .internal.Schiller.Eberhardt(x, u2 * n, n, alpha = config$alpha)
 	  tau <- sqrt(res$sb2)

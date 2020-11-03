@@ -18,7 +18,7 @@ Shows the confidence intervals associated with the different gconsensus values s
   The plot contains the confidence intervals associated with the set of gconsensus values under comparison.
 }
 \value{
-  a plot object.
+  a plot object
 }
 \author{
 \packageAuthor{gconsensus}
@@ -26,9 +26,8 @@ Shows the confidence intervals associated with the different gconsensus values s
 Maintainer: \packageMaintainer{gconsensus}
 }
 \seealso{
-  \code{\link{comparison.gconsensus}}, \code{\link{print.comparison}}, \code{\link{plot}}
+ \code{\link{comparison.gconsensus}}, \code{\link{print.comparison}}, \code{\link{plot}}
 }
-
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ comparison.gconsensus }% use one of  RShowDoc("KEYWORDS")

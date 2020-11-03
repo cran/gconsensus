@@ -78,6 +78,7 @@ plot.gconsensus <- function(x, ...) {
                 c(x$ilab$data$mean + x$ilab$data$k * sqrt(x$ilab$data$sd^2 + (x$fit$tau)^2), 
 			x$fit$value + x$fit$U),
                 na.rm = TRUE)
+  wlab <- ""
   if (display.shownames) wlab <- "source name" else wlab <- "source code"
 
   zlab <- x$ilab$info$value[x$ilab$info$variable == "Units"]
@@ -180,7 +181,7 @@ plot.gconsensus <- function(x, ...) {
 #    lines(rep(x$fit$value + x$fit$U, 2), c(1, p), col = "lightgreen")
     
     lines(xx.pdf, p + 1 + 2*yy.pdf/max(c(yy.eq,yy.pdf)), lwd = 2)
-    lines(xx.pdf, p + 1 + 2*yy.eq/max(c(yy.eq,yy.pdf)), lwd = 2, col = 5)
+    lines(xx.pdf, p + 1 + 2*yy.eq/max(c(yy.eq,yy.pdf)), lwd = 2, col = 4)
   }
 
   points(xx, yy, pch = 20, cex = 1, col = 2 ) #my.color)

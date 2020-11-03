@@ -6,8 +6,7 @@
 }
 \description{
 \packageDescription{gconsensus}
-Partially based on the results published in Control clinical Trials (1985).
-<https://doi.org/10.1016/0197-2456(86)90046-2>
+Partially based on the results published in Control clinical trials (1985). <https://doi.org/10.1016/0197-2456(86)90046-2>
 For a complete list of references see the reference section.
 }
 \details{
@@ -24,6 +23,7 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{gconsensus}
 }
 \references{
+~~ Literature or other references for background information ~~
 1. Graybill and Deal (1959), \emph{Combining Unbiased Estimators}, Biometrics, 15, pp. 543-550.
 
 2. DerSimonian and Laird (1986), \emph{Meta-analysis in Clinical Trials}, Controlled Clinical Trials, 7, pp. 177-188.
@@ -59,6 +59,9 @@ Maintainer: \packageMaintainer{gconsensus}
 %~~ Optionally other standard keywords, one per line, from file KEYWORDS in ~~
 \keyword{ package }
 
+\seealso{
+ \code{\link{gconsensus}}
+}
 \examples{
 ilab <- list(
   data = data.frame(
@@ -84,7 +87,8 @@ aConsensus <- gconsensus(ilab,
                unreliable.uncertainties = FALSE,
                MC_samples = 1e5,
                MC_seed = 12345,
-               MC_use.HKSJ.adjustment = FALSE
+               MC_use.HKSJ.adjustment = FALSE,
+		filename = "hb_consensus_model.txt"
                )
 )
 

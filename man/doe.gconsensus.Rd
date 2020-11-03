@@ -12,7 +12,7 @@ doe.gconsensus(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{A generalized consensus object.}
+  \item{x}{A generalized consensus object}
 }
 \details{
 The unilateral degrees of equivalence are obtained from the participants data and the estimated generalized consensus value described in the gconsensus value.
@@ -34,7 +34,6 @@ Maintainer: \packageMaintainer{gconsensus}
 \seealso{
  \code{\link{gconsensus}}, \code{\link{print.doe}}, \code{\link{plot.doe}}
 }
-
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ gconsensus }% use one of  RShowDoc("KEYWORDS")

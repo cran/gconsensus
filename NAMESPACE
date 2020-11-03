@@ -1,9 +1,10 @@
-import(stats, graphics, MASS, utils, grDevices)
+import(stats, graphics, MASS, utils, grDevices, coda, rjags)
 
 importFrom("graphics", "abline", "axis", "barplot", "curve", "legend", "par", "plot", "text")
 importFrom("MASS", "ginv")
 importFrom("utils", "capture.output")
 importFrom("grDevices", "rgb")
+importFrom("rjags", "jags.model", "coda.samples")
 
 exportPattern("^[[:alpha:]]+")
 
@@ -16,3 +17,4 @@ S3method(plot, doe)
 S3method(toString, comparison)
 S3method(print, comparison)
 S3method(plot, comparison)
+
