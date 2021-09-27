@@ -12,6 +12,7 @@ gconsensus(ilab, method = "mean",
   build.model = NULL, get.samples = NULL,
   config = list(alpha = 0.05, 
     expansion.factor.type = "naive", 
+    tau = mad(ilab$data$mean),
     unreliable.uncertainties = FALSE, 
     MC_samples = 1e5, 
     MC_seed = NA, 
@@ -25,11 +26,12 @@ gconsensus(ilab, method = "mean",
  \code{mean} [15], \code{grand.mean} [15], \code{median} [15], \code{h15} for Huber estimator [15], \code{MCM.mean} for Monte Carlo mean, \code{MCM.median} for Monte Carlo median, \code{GD1} for the original Graybill-Deal estimator [1], \code{GD2} for the modified Graybill-Deal estimator as described by Sinha [13], \code{GD3} for the modified Graybill-Deal estimator as described by Zhang [14], \code{GD4} for the modified Graybill-Deal estimator as described by Zhang [14], \code{DL1} for original DerSimonian-Laid estimator [2], \code{DL2} for the modified DerSimonian-Laird estimator as described by Horn-Horn-Duncan [3], \code{PM} for original Paul-Mandel estimator [5], \code{MPM} for the modified Paul-Mandel estimator [6], \code{VRMLE} for Vangel-Rukhin MLE [7, 8, 9, 10, 11], \code{BOB} for the type B on Bias estimator [4], \code{SE} for the Schieller-Eberhardt [12], MCM.LP for linear pool, HB for Hierarchical Bayesian}
 
   \item{build.model}{a function (NULL by default) to build a JAGS model}
-  \item{get.samples}{a function (NULL by dafault) to obtain the CORA samples based on the JAGS model}
+  \item{get.samples}{a function (NULL by dafault) to obtain the CODA samples based on the JAGS model}
 
   \item{config}{list, contains the configuration options used in the computational process. The complete list of options is:
 		\code{alpha} for the significance level, default value = 0.05,
 		\code{expansion.factor.type} for the type of coverage factor to be used: "naive" which use a coverage factor=2, "large sample" which uses a normal quantile, "small sample" which uses a t quantile,
+		\code{tau} initial value for the between source uncertainty component, by default it is assigned the median of the absolute deviations of the reported values,
 		\code{unreliable.uncertainties} an indicator for unreliables uncertainties, if TRUE then adjustment is used [15],
 		\code{MC_samples} the number of cycles used in the simple Monte Carlo simulation,
 		\code{MC_seed} the seed used to initializing the random number generator in the Monte Carlo simulation,

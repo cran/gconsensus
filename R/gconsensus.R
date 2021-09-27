@@ -5,12 +5,13 @@ gconsensus <- function(ilab, method = "mean",
 		      build.model = NULL, get.samples = NULL,
                       config = list(alpha = 0.05,
                                     expansion.factor.type = "naive",
+								 tau = mad(ilab$data$mean),
                                     unreliable.uncertainties = FALSE,
                                     MC_samples = 1e5,
                                     MC_seed = NA,
                                     MC_use.HKSJ.adjustment = FALSE,
-					filename = "hb_consensus_model.txt"
-                                    )
+								 filename = "hb_consensus_model.txt"
+                                   )
                       ) {
   mss <- rep(TRUE, length(ilab$data$mean))
   
@@ -38,8 +39,8 @@ gconsensus <- function(ilab, method = "mean",
   }
 ## end
   
-  qq <- 1
-  tau <- 0
+#  qq <- 1
+  tau <- config$tau
 	if (all(is.null(n))) { n <- rep(2, length(x)) }
 	if (method == "mean") {
 	  res <- .internal.mom(x, u2 * n, n, alpha = config$alpha)
@@ -75,6 +76,7 @@ gconsensus <- function(ilab, method = "mean",
 	} else if (method == "DL1") {
 	  res <- .internal.dersimonian.laird(x, u2 * n, n, alpha = config$alpha)
 	  tau <- sqrt(res$sb2)
+		if (tau > 0) {
 	  if (config$MC_use.HKSJ.adjustment) {
 	    if (!is.null(res$w.i)) {
 	      mm <- sum(subset)
@@ -86,10 +88,14 @@ gconsensus <- function(ilab, method = "mean",
 	  } else {
 	    qq <- 1
 	  }
+		} else {
+			qq <- 1
+		}
 	  res$u.mu <- qq*res$u.mu
 	} else if (method == "DL2") {
 	  res <- .internal.ss.dersimonian.laird(x, u2 * n, n, alpha = config$alpha)
 	  tau <- sqrt(res$sb2)
+		if (tau > 0) {
 	  if (config$MC_use.HKSJ.adjustment) {
 	    if (!is.null(res$w.i)) {
 	      mm <- sum(subset)
@@ -101,6 +107,9 @@ gconsensus <- function(ilab, method = "mean",
 	  } else {
 	    qq <- 1
 	  }
+		} else {
+			qq <- 1
+		}
 	  res$u.mu <- qq*res$u.mu
 	} else if (method == "PM") {
 	  res <- .internal.pmm(x, u2 * n, n, alpha = config$alpha)
@@ -110,7 +119,8 @@ gconsensus <- function(ilab, method = "mean",
 	  tau <- sqrt(res$sb2)
 	} else if (method == "HB") {
 	  res <- .internal.hb(x, u2, n, build.model, get.samples, 
-			      alpha = config$alpha, seed = config$MC_seed,
+			      alpha = config$alpha, tau = tau,
+				  seed = config$MC_seed,
 			      MC_samples = config$MC_samples,
 				file = file.path(tempdir(), config$filename))
 	  tau <- sqrt(res$var.b)
@@ -136,7 +146,7 @@ gconsensus <- function(ilab, method = "mean",
   res2$config <- config
   res.unit <- ilab$info$value[ilab$info$variable == "Units"]
 
-  res2$fit <- data.frame(value = res$mu, U = qq*k*res$u.mu, 
+  res2$fit <- data.frame(value = res$mu, U = k*res$u.mu, 
 		unit = res.unit, k = k, p = 1-config$alpha, tau = tau)
 
   class(res2) <- "gconsensus"

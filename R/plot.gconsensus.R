@@ -79,7 +79,7 @@ plot.gconsensus <- function(x, ...) {
 			x$fit$value + x$fit$U),
                 na.rm = TRUE)
   wlab <- ""
-  if (display.shownames) wlab <- "source name" else wlab <- "source code"
+#  if (display.shownames) wlab <- "source name" else wlab <- "source code"
 
   zlab <- x$ilab$info$value[x$ilab$info$variable == "Units"]
   

@@ -425,9 +425,10 @@
                var.b = tau2, ci.mu = ci.mu))
 }
 
-## 2020-01-21: hierarchical beyesian method was included
+## 2020-01-21: hierarchical bayesian method was included with laplacian between random effect
+## 2021-03-02: hierarchical bayesian method with gaussian between random effect
 .internal.hb <- function(o.mu, o.s2, o.n, build.model = NULL, get.samples = NULL, 
-			alpha = 0.05, seed = 12345, MC_samples = 250000, file = file) {
+			alpha = 0.05, tau = mad(o.mu), seed = 12345, MC_samples = 250000, file = file) {
   build.model<- match.fun(build.model)
   get.samples<- match.fun(get.samples)
   p <- length(o.mu)
@@ -440,13 +441,18 @@
         tau.b<- 1/pow(u.b, 2)
         tau.w<- 1/pow(u.w, 2)
         for(i in 1 : n) {
-        # half cauchy distribution
+#        # half cauchy distribution
         sigma.with[i] ~ dt(0, tau.w, 1)I(0,)
         ptau.with[i]<- 1/pow(sigma.with[i], 2)
         lambda[i] ~ dnorm(0, ptau.btw)
         cmu[i]<- mu+lambda[i]
         ybar[i] ~ dnorm(cmu[i], ptau.with[i])
         }	
+#        # chisqr distribution
+#        shape<- 1/2
+#        scale<- 2*pow(u.b, 2)
+#        sigma2.btw ~ dgamma(1/2, scale)
+#        ptau.btw<- 1/sigma2.btw
         # half cauchy distribution
         sigma.btw ~ dt(0, tau.b, 1)I(0,)
         ptau.btw <- 1/pow(sigma.btw, 2)
@@ -454,7 +460,7 @@
   }", file = file) #"consensus_model.txt")
 
     ##### observed data
-    dat <- list("n" = p, u.w = median(sqrt(o.s2)), u.b = mad(o.mu), 
+    dat <- list("n" = p, "u.w" = median(sqrt(o.s2)), "u.b" = tau, #mad(o.mu), 
                 "ybar" = o.mu, "sigma.with" = sqrt(o.s2))  # names list of numbers
     ##### Initial values
     inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
@@ -498,7 +504,7 @@
   }", file = file)
 
   ##### observed data
-  dat <- list("n" = p, u.w = median(sqrt(o.s2)), u.b = mad(o.mu), 
+  dat <- list("n" = p, "u.w" = median(sqrt(o.s2)), "u.b" = tau, # mad(o.mu), 
               "ybar" = o.mu, "sigma2.with" = o.s2, "nu" = o.n-1)  # names list of numbers
   ##### Initial values
   inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
