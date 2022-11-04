@@ -13,15 +13,15 @@ plot.doe <- function(x, ...) {
   if (is.null(display.tab.size)) display.tab.size <- 12
   if (is.null(display.signif.digits)) display.signif.digits <- 2
 
-  mss <- rep(TRUE, length(x$gconsensus$ilab$data$mean))
+  mss <- rep(TRUE, length(x$gconsensus$ilab$data$value))
 
   n <- length(x$fit$value)
   subset <- x$gconsensus$ilab$data$included[mss] == 1
 
   if (display.order == "location") {
-    ss <- order(x$gconsensus$ilab$data$mean[mss])
+    ss <- order(x$gconsensus$ilab$data$value[mss])
   } else if (display.order == "dispersion") {
-    ss <- order(x$gconsensus$ilab$data$sd[mss])
+    ss <- order(x$gconsensus$ilab$data$expandedUnc[mss])
   } else {
     if (display.shownames) {
       ss <- order(x$fit$lab[mss]) 
@@ -38,6 +38,7 @@ plot.doe <- function(x, ...) {
     ssxlab<- "Source code"
   }
   ssxlab <- ""
+  ssylab <- x$fit$unit[1]
 
   sxlab <- c(xlab)
   # mark excluded values writeing name or code between brackets
@@ -48,7 +49,7 @@ plot.doe <- function(x, ...) {
   zz <- c(1:n)
   zlim <- c(1, n)
   ww <- x$fit$value[ss]
-  wlim <- range(c(x$fit$value - x$fit$U, x$fit$value + x$fit$U))
+  wlim <- range(c(x$fit$value - x$fit$expandedUnc, x$fit$value + x$fit$expandedUnc))
 
   if (display.orientation == "horizontal") {
     xx <- zz
@@ -58,7 +59,7 @@ plot.doe <- function(x, ...) {
     xaxis <- 1
     yaxis <- 2
     xlab <- ssxlab
-    ylab <- ""
+    ylab <- ssylab
   } else {
     xx <- ww
     yy <- zz
@@ -66,7 +67,7 @@ plot.doe <- function(x, ...) {
     ylim <- zlim
     xaxis <- 2
     yaxis <- 1
-    xlab <- ""
+    xlab <- ssylab
     ylab <- ssxlab
   }
 
@@ -78,7 +79,7 @@ plot.doe <- function(x, ...) {
        ylab = ylab,
        pch = 19,
        main = paste0("Unilateral Degrees of Equivalence\n", 
-			x$gconsensus$study, " - ", x$gconsensus$measurand),
+			x$gconsensus$exercise, " - ", x$gconsensus$measurand),
        xlim = xlim, ylim = ylim)
   
   axis(yaxis)
@@ -89,7 +90,7 @@ plot.doe <- function(x, ...) {
 
   if (display.orientation == "horizontal") {
     for (ii in 1:n) {
-      lines(rep(ii, 2), x$fit$value[ss][ii] + c(-1, 1)*x$fit$U[ss][ii])
+      lines(rep(ii, 2), x$fit$value[ss][ii] + c(-1, 1)*x$fit$expandedUnc[ss][ii])
     }
     for (i in 1:n) 
       if (!x$gconsensus$subset[ss][i])
@@ -97,7 +98,7 @@ plot.doe <- function(x, ...) {
     abline(h = 0)
   } else {
     for (ii in 1:n) {
-      lines(x$fit$value[ss][ii] + c(-1, 1)*x$fit$U[ss][ii], rep(ii, 2))
+      lines(x$fit$value[ss][ii] + c(-1, 1)*x$fit$expandedUnc[ss][ii], rep(ii, 2))
     }
     for (i in 1:n) 
       if (!x$gconsensus$subset[ss][i])

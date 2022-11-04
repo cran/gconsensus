@@ -23,7 +23,6 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{gconsensus}
 }
 \references{
-~~ Literature or other references for background information ~~
 1. Graybill and Deal (1959), \emph{Combining Unbiased Estimators}, Biometrics, 15, pp. 543-550.
 
 2. DerSimonian and Laird (1986), \emph{Meta-analysis in Clinical Trials}, Controlled Clinical Trials, 7, pp. 177-188.
@@ -68,28 +67,42 @@ ilab <- list(
     participant = c("BAM", "IRMM", "LGC", "NARL", "NIST", "NMIJ", "NRC"),
     code = paste0("p", c(1:7)),
     method = rep(1, 7), 
-    mean = c(10.21, 10.9, 10.94, 10.58, 10.81, 9.62, 10.8), 
-    sd = c(0.381, 0.250, 0.130, 0.410, 0.445, 0.196, 0.093), 
+    value = c(10.21, 10.9, 10.94, 10.58, 10.81, 9.62, 10.8), 
+    unit = rep("\\\\micro \\\\kilogram/\\\\kilogram", 7),
+    expandedUnc = c(0.381, 0.250, 0.130, 0.410, 0.445, 0.196, 0.093), 
     n = rep(1, 7), 
-    kp = rep(2, 7), 
+    coverageFactor = rep(2, 7),
+    coverageProbability = rep(0.95, 7), 
+	method.type = rep("p", 7),
     included = rep(1, 7)),
-  info = list(variable = c("Software", "Institute", "Study", "Author", "Date", 
+	symbol = rep(1, 7),
+	symbol.Fillcolor = rep(1, 7),
+	comments = rep("", 7),
+	info = list(variable = c("Software", "Institute", "Exercise", "Author", "Date", 
       "Measurand", "Units"), 
     value = c("consensus", "BIPM", "CCQM-K25", "Michele Schantz & Stephen Wise",
-      "12-12-2003", "PCB 105", "ug/g"))
+      "12-12-2003", "PCB 105", "\\\\micro \\\\kilogram/\\\\kilogram"))
 )
 
 aConsensus <- gconsensus(ilab,
   method = "DL1",
   config = list(
-               alpha = 0.05,
+               signif.digits = 2,
+			   display.order = "location",
+			   display.orientation = "horizontal",
+			   display.shownames = TRUE,
+			   tab.size = 12,
+			   alpha = 0.05,
                expansion.factor.type = "small.sample",
+			   tau = mad(ilab$data$value),
                unreliable.uncertainties = FALSE,
                MC_samples = 1e5,
                MC_seed = 12345,
-               MC_use.HKSJ.adjustment = FALSE,
-		filename = "hb_consensus_model.txt"
-               )
+               MC_use.HKSJ.adjustment = TRUE,
+			   MC_interval.type = "symmetric",
+			   MC_use.parallel.computing = FALSE,
+		       filename = "hb_consensus_model.txt"
+          )
 )
 
 print(aConsensus)

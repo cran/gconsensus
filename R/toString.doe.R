@@ -13,12 +13,12 @@ toString.doe <- function(x, ...) {
   if (is.null(display.tab.size)) display.tab.size <- 12
   if (is.null(display.signif.digits)) display.signif.digits <- 2
 
-  mss <- rep(TRUE, length(x$gconsensus$ilab$data$mean))
+  mss <- rep(TRUE, length(x$gconsensus$ilab$data$value))
   
   if (display.order == "location") {
-    ss <- order(x$gconsensus$ilab$data$mean[mss])
+    ss <- order(x$gconsensus$ilab$data$value[mss])
   } else if (display.order == "dispersion") {
-    ss <- order(x$gconsensus$ilab$data$sd[mss])
+    ss <- order(x$gconsensus$ilab$data$expandedUnc[mss])
   } else {
     if (display.shownames) {
       ss <- order(x$gconsensus$ilab$data$participant[mss])
@@ -28,7 +28,7 @@ toString.doe <- function(x, ...) {
   }
   
   str <- paste0("Consensus method: ", x$gconsensus$method,".\n")
-  str <- paste0(str, "Study: ", x$gconsensus$study,".\n")
+  str <- paste0(str, "Exercise: ", x$gconsensus$exercise,".\n")
   str <- paste0(str, "Measurand: ", x$gconsensus$measurand,".\n")
   str <- paste0(str, "Evaluation based on Degrees of Equivalence.\n\n")
 

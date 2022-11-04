@@ -380,8 +380,8 @@
 
 .internal.mm.pdf <- function(x, B = 1e5, new.seed = 12345) {
 	set.seed(new.seed)
-	p <- length(x$mean)
-	Xb <- matrix(rnorm(B*p, x$mean, x$sd), B, p, byrow = TRUE )
+	p <- length(x$value)
+	Xb <- matrix(rnorm(B*p, x$value, x$expandedUnc/x$coverageFactor), B, p, byrow = TRUE )
 
 	return(Xb)
 }
@@ -428,14 +428,21 @@
 ## 2020-01-21: hierarchical bayesian method was included with laplacian between random effect
 ## 2021-03-02: hierarchical bayesian method with gaussian between random effect
 .internal.hb <- function(o.mu, o.s2, o.n, build.model = NULL, get.samples = NULL, 
-			alpha = 0.05, tau = mad(o.mu), seed = 12345, MC_samples = 250000, file = file) {
+			alpha = 0.05, tau = mad(o.mu), seed = 12345, MC_samples = 250000, 
+			MC_burn_in = 1000, file = file) {
   build.model<- match.fun(build.model)
   get.samples<- match.fun(get.samples)
   p <- length(o.mu)
 
   o.n[is.na(o.n)]<- 0
+
+  # these were not assigned previously
+  u.b <- (tau)
+  u.w <- sqrt(o.s2)
+
   if (all(is.na(o.n)) | all(o.n<2)) {
-  ## 2020-01-26: case when no dof are provided    
+  ## 2020-01-26: case when no dof are provided   
+#    print("Laplace model")
     cat("model
 	{
         tau.b<- 1/pow(u.b, 2)
@@ -463,7 +470,8 @@
     dat <- list("n" = p, "u.w" = median(sqrt(o.s2)), "u.b" = tau, #mad(o.mu), 
                 "ybar" = o.mu, "sigma.with" = sqrt(o.s2))  # names list of numbers
     ##### Initial values
-    inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
+    ## use of robust statistics median + mad
+    inits <- list( mu = median(o.mu), sigma.btw = mad(o.mu), 
                    lambda = rep(0, length(o.mu)),
                    ".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = seed )
     #### specify parameters to be monitored
@@ -472,11 +480,11 @@
     jags.m <- build.model( file = file, data=dat, inits=inits, 
 			n.chains=1, n.adapt=1000, quiet = TRUE )
     ## run JAGS and save posterior samples, does not show progress report
-    samps <- get.samples( jags.m, params, n.iter = MC_samples, thin = 25, 
+    samps <- get.samples( jags.m, params, n.iter = MC_burn_in + MC_samples, thin = 25, 
                            progress.bar = "gui" )
     ## summarize posterior samples
     # Burn in of 50000. Start at 50001.
-    res.sum <- summary(window(samps, start=50001), 
+    res.sum <- summary(window(samps, start = MC_burn_in + 1), 
                        quantile = c(alpha/2, 1-alpha/2))
     
     mu.hat<- res.sum$statistics[p+1, 1]
@@ -484,6 +492,7 @@
     tau2<- res.sum$statistics[p+2, 1]^2
     ci.mu<- res.sum$quantiles[p+1, c(1, 2)]
 } else if (all(o.n>1)) {
+#  print("Gaussian model")
   cat("model
 	{
       tau.b<- 1/pow(u.b, 2)
@@ -507,7 +516,8 @@
   dat <- list("n" = p, "u.w" = median(sqrt(o.s2)), "u.b" = tau, # mad(o.mu), 
               "ybar" = o.mu, "sigma2.with" = o.s2, "nu" = o.n-1)  # names list of numbers
   ##### Initial values
-  inits <- list( mu = mean(o.mu), sigma.btw = sd(o.mu), 
+  ## use of robust statistics for inits: median + mad
+  inits <- list( mu = median(o.mu), sigma.btw = mad(o.mu), 
                  lambda = rep(0, length(o.mu)),
                  ".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = seed )
   #### specify parameters to be monitored
@@ -516,11 +526,11 @@
   jags.m <- build.model( file = file, data=dat, inits=inits, 
 			n.chains=1, n.adapt=1000, quiet = TRUE )
   ## run JAGS and save posterior samples, does not show progress report
-  samps <- get.samples( jags.m, params, n.iter = MC_samples, thin = 25, 
+  samps <- get.samples( jags.m, params, n.iter = MC_burn_in + MC_samples, thin = 25, 
                          progress.bar = "gui" )
   ## summarize posterior samples
   # Burn in of 50000. Start at 50001.
-  res.sum <- summary(window(samps, start=50001), 
+  res.sum <- summary(window(samps, start = MC_burn_in + 1), 
                      quantile = c(alpha/2, 1-alpha/2))
   
   mu.hat<- res.sum$statistics[p+1, 1]

@@ -12,9 +12,10 @@ gconsensus(ilab, method = "mean",
   build.model = NULL, get.samples = NULL,
   config = list(alpha = 0.05, 
     expansion.factor.type = "naive", 
-    tau = mad(ilab$data$mean),
+    tau = mad(ilab$data$value),
     unreliable.uncertainties = FALSE, 
-    MC_samples = 1e5, 
+    MC_samples = 1e5,
+    MC_burn_in = 1000,
     MC_seed = NA, 
     MC_use.HKSJ.adjustment = FALSE,
     filename = "hb_consensus_model.txt"))
@@ -31,16 +32,14 @@ gconsensus(ilab, method = "mean",
   \item{config}{list, contains the configuration options used in the computational process. The complete list of options is:
 		\code{alpha} for the significance level, default value = 0.05,
 		\code{expansion.factor.type} for the type of coverage factor to be used: "naive" which use a coverage factor=2, "large sample" which uses a normal quantile, "small sample" which uses a t quantile,
-		\code{tau} initial value for the between source uncertainty component, by default it is assigned the median of the absolute deviations of the reported values,
+		\code{tau} initial estimate of between source uncertainty, by default it takes the mad of the reported values,
 		\code{unreliable.uncertainties} an indicator for unreliables uncertainties, if TRUE then adjustment is used [15],
 		\code{MC_samples} the number of cycles used in the simple Monte Carlo simulation,
+		\code{MC_burn_in} the number of initial cycles to be drop from Monte Carlo simulation. The Bayesian algorithm becomes stationary but in the begining it can be noisy, this is fixed by dropping the initial samples.
 		\code{MC_seed} the seed used to initializing the random number generator in the Monte Carlo simulation,
 		\code{MC_use.HKSJ.adjustment} a flag indicating if small sample adjustments are required [16],
 		\code{filename} a string containing the name of the file for communication with JAGS package.
 %		\code{MC_use.parallel.computing} a flag indicating if parallel computing should be used in the Monte Carlo simulation, when available,
-%		\code{MC_use.adaptative.method} a flag indicating if simple or adaptative algorithm is used in the Monte Carlo simulation,
-%		\code{MC_sample.size.increment} numeric, the size of the sample to be incremented in search of the convergence of the adaptative Monte Carlo simulation,
-%		\code{MC_sample.size.upper.bound} largest sample size allowed to commit in the adaptative Monte Carlo simulation.
 }
 }
 \details{
@@ -51,6 +50,7 @@ Display can be customized by using the options mechanism. Available options are:
 		\code{display.shownames} a boolean, if true source names are used otherwise source codes are used,
 		\code{display.tab.size} an integer representing the column width used in formating data tables,
 		\code{display.orientation} a string ("horizontal", "vertical"), plot orientation.
+		\code{display.expandedUncertainty} a boolean, plot standard uncertainties or expanded uncertainties.
 }
 }
 \value{
@@ -59,7 +59,7 @@ Display can be customized by using the options mechanism. Available options are:
   \item{subset}{the subset of included values in the consensus value estimation.}
   \item{ilab}{the current participants' information.}
   \item{config}{the current configuration options provided for the consensus value estimation process.}
-  \item{study}{the study the consensus belongs to.}
+  \item{exercise}{the exercise the consensus belongs to.}
   \item{measurand}{the measurand the consensus belongs to.}
 }
 \author{

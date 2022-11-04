@@ -15,11 +15,12 @@ Shows the probability distribution of the estimated gconsensus value.
 }
 \details{
   The plot shows the confidence interval for each of the participants' values, the consensus value and its confidence interval, on the right side the probability distribution associated with the consensus value is showed and a normal distribution with the same expected value and variace.
-  formating options of the plot:
+  Formating options of the plot:
   \code{display.order} a string, this is used to order the data source, valid values are: "location" for sorting based on the repoted means, "dispersion" for sorting based on reported variances, any other value for sorting based on typing order. Default value is "location".
   \code{display.shownames} a logical, if true then the participants names are used to identify the ploted values, otherwise the  code value is used instead. Default value is FALSE.
   \code{display.orientation} a string, this is used to build the plot vertically or horizontally, valid values are: "horizontal" otherwise vertical is assumed, default value is "horizontal".
   \code{display.length.out} a numeric, this represents the number of points to build the mixture distribution, default value = 101.
+  \code{display.expandedUncertainty} a logical, if true then expanded uncertainty is used for plots, otherwise standard uncertainty is used. Default value is FALSE.
 }
 \value{
   a plot object.

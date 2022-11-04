@@ -16,7 +16,12 @@ Plots a char showing the confidence interval for the unilateral degrees of equiv
   \item{\dots}{ Any additional graphical parameter}
 }
 \details{
-Plot a doe object using the options \code{display.order} and \code{display.shownames}
+Plot a unilateral degree of equivalence (doe) object.
+  Formating options of the plot:
+  \code{display.order} a string, this is used to order the data source, valid values are: "location" for sorting based on the repoted means, "dispersion" for sorting based on reported variances, any other value for sorting based on typing order. Default value is "location".
+  \code{display.shownames} a logical, if true then the participants names are used to identify the ploted values, otherwise the  code value is used instead. Default value is FALSE.
+  \code{display.orientation} a string, this is used to build the plot vertically or horizontally, valid values are: "horizontal" otherwise vertical is assumed, default value is "horizontal".
+  \code{display.expandedUncertainty} a logical, if true then expanded uncertainty is used for plots, otherwise standard uncertainty is used. Default value is FALSE.
 }
 \value{
 A plot of the doe object using the options displor.order and display.shownames, showing the confidence interval for the unilateral degree of equivalence attached to each participant.

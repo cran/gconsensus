@@ -19,7 +19,7 @@ The unilateral degrees of equivalence are obtained from the participants data an
 }
 \value{
 A doe object containing the unilateral degrees of equivalence.
-  \item{fit}{a data.frame with the source code, source lab name, value, expanded uncertainty, unit, expansion factor, probability coverage and tau.}
+  \item{fit}{a data.frame with the source code, source lab name, value, expanded uncertainty, unit, coverage factor, probability coverage and tau.}
   \item{gconsensus}{the generalized consensus object the evaluation is based on.}
 
 }
